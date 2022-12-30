@@ -1,0 +1,116 @@
+---
+
+-
+  # Note: @notation can contain more than one value
+  # The ordering below is the order in which words come out when there is more than one value
+  # 
+   name: default
+   tag: menclose
+   match: "."
+   replace:
+    - test:
+        if: ". [contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
+        then: [t: w prostokątnej ramce, pause: short]
+    - test:
+        if: ".[contains(@notation,'roundedbox')]"
+        then: [t: w zaokrąglonej ramce, pause: short]
+    - test:
+        if: ".[contains(@notation,'circle')]"
+        then: [t: w okrągłej ramce, pause: short]
+    - test:
+        if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or 
+                contains(concat(' ', normalize-space(@notation), ' '), ' right ') or 
+                contains(@notation,'top') or contains(@notation,'bottom') ]"
+        then:
+          - t: z linią ramki
+          - test:
+              if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
+              then: [t: po lewej, pause: short]
+          - test:
+              if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
+              then: [t: po prawej, pause: short]
+          - test:
+              if: ".[contains(@notation,'top')]"
+              then: [t: na górze, pause: short]
+          - test:
+              if: ".[contains(@notation,'bottom')]"
+              then: [t: na dole, pause: short]
+    - test:
+        if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
+                contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
+        then:
+          - test:
+              if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
+              then: [spell: krzyżowo, t: krzyżowo, pause: short]  # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+              else:
+                - test:
+                    if: ".[contains(@notation,'updiagonalstrike')]"
+                    then: [t: diagonalnie, pause: short]
+                - test:
+                    if: ".[contains(@notation,'downdiagonalstrike')]"
+                    then: [t: odwrotnie diagonalnie, pause: short]
+          - test:
+              if: ".[contains(@notation,'verticalstrike')]"
+              then: [t: pionowo, pause: short]
+          - test:
+              if: ".[contains(@notation,'horizontalstrike')]"
+              then: [t: poziomo, pause: short]
+          - t: przekreślone
+          - pause: short
+    - test:
+        if: ".[contains(@notation,'uparrow')]"
+        then: [t: ze strzałką w górę, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
+        then: [t: ze strzałką w dół, pause: short]
+    - test:
+        if: ".[contains(@notation,'leftarrow')]"
+        then: [t: ze strzałką w lewo, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
+        then: [t: ze strzałką w prawo, pause: short]
+    - test:
+        if: ".[contains(@notation,'northeastarrow')]"
+        then: [t: ze strzałką na północny wschód, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
+        then: [t: ze strzałką na południowy wschód, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
+        then: [t: ze strzałką na południowy zachód, pause: short]
+    - test:
+        if: ".[contains(@notation,'northwestarrow')]"
+        then: [t: ze strzałką na północny zachód, pause: short]
+    - test:
+        if: ".[contains(@notation,'updownarrow')]"
+        then: [t: "z dwukierunkową, pionową strzałką", pause: short]
+    - test:
+        if: ".[contains(@notation,'leftrightarrow')]"
+        then: [t: "z dwukierunkową, poziomą strzałką", pause: short]
+    - test:
+        if: ".[contains(@notation,'northeastsouthwestarrow')]"
+        then: [t: "z dwukierunkową, diagonalną strzałką", pause: short]
+    - test:
+        if: ".[contains(@notation,'northwestsoutheastarrow')]"
+        then: [t: "z dwukierunkową, odwrotnie diagonalną strzałką", pause: short]
+    - test:
+        if: ".[contains(@notation,'actuarial')]"
+        then: [t: z aktuarialnym symbolem, pause: short]
+    - test:
+        if: ".[contains(@notation,'madrub')]"
+        then: [t: z arabskim symbolem ułamka, pause: short]
+    - test:
+        if: ".[contains(@notation,'phasorangle')]"
+        then: [t: ze wskazem kąta, pause: short]
+    - test:
+        if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']"      # default
+        then: [t: z symbolem dzielenia pod kreskę, pause: short]
+    - test:
+        if: ".[contains(@notation,'radical')]"
+        then: [t: pod pierwiastkiem kwadratowym, pause: short]
+    - t: zawiera się wzór
+    - x: "*"
+    - test:
+        if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
+        then: [t: koniec wzoru]
+    - pause: short

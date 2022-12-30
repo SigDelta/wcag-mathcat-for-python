@@ -1,0 +1,389 @@
+---
+#default rules shared among several speech rules
+-
+    name: default
+    tag: math
+    match: "."
+    replace:
+    - test:
+        if: "$MathRate = 100"
+        then: [x: "*"]
+        else:
+        - rate:
+            value: "$MathRate"
+            replace: [x: "*"]
+
+-
+    name: empty-mrow
+    tag: mrow
+    match: "not(*)"
+    replace: 
+    - t: " "  # say nothing -- placeholder
+
+-
+    name: default
+    tag: mrow
+    match: "."
+    replace: 
+    - insert:
+        nodes: "*"
+        replace: [pause: auto]
+
+-
+    name: default
+    tag: [mi, mn, mo, mtext]
+    match: "."
+    replace:
+    - bookmark: "@id"
+    - test:
+        if: ".[contains(text(), 'where')]"
+        then: [t: 'gdzie']
+        else: [x: "text()"]
+
+-
+    name: default
+    tag: ms
+    match: "."
+    replace: 
+    - t: "tekst"
+    - pause: short
+    - x: "text()"
+
+-
+    name: default
+    tag: mstyle
+    match: "."
+    replace: [x: "*"]
+
+-
+    name: simple-sub
+    tag:  particular-value-of
+            # invisible comma -- want "x sub 1 1" without "end sub"
+    match: "IsNode(*[2], 'simple') or *[2][self::m:mrow][*[2][text()='\u2063']]"
+    replace:
+        - x: "*[1]"
+        - test:
+            if: "$Verbosity!='Terse' or not(*[2][self::m:mn])" # just say "x 1" for terse vs "x sub 1"
+            then: [t: "indeks dolny"]
+        - x: "*[2]"
+
+-
+    name: default
+    tag:  particular-value-of
+    match: "."
+    replace:
+        - x: "*[1]"
+        - t: "indeks dolny" 
+        - x: "*[2]"
+        - t: "koniec indeksu dolnego"
+        - pause: short
+
+-
+    name: default
+    tag: msubsup
+    match: "."
+    replace: 
+    - x: "*[1]"
+    - t: indeks dolny
+    - x: "*[2]"
+    - t: "indeks górny"
+    - x: "*[3]"
+-
+    name: default
+    tag: mfixfix
+    match: "."
+    replace: 
+    - x: "*[1]"
+    - t: indeks dolny
+    - x: "*[2]"
+    - t: "indeks górny"
+    - x: "*[3]"
+-
+    name: default
+    tag: munder
+    match: "."
+    replace: 
+    - test:
+        if: "not(IsNode(*[1], 'simple'))"
+        then: [t: ""]
+    - x: "*[1]"
+    - t: "z"
+    - x: "*[2]"
+    - t: poniżej
+    
+-
+    name: default
+    tag: mover
+    match: "."
+    replace: 
+    - test:
+        if: "not(IsNode(*[1], 'simple'))"
+        then: [t: ""]
+    - x: "*[1]"
+    - t: "z"
+    - x: "*[2]"
+    - t: "powyżej"
+    
+-
+    name: default
+    tag: munderover
+    match: "."
+    replace: 
+    - test:
+        if: "not(IsNode(*[1], 'simple'))"
+        then: [t: "modified"]
+    - x: "*[1]"
+    - t: "z"
+    - x: "*[2]"
+    - t: "poniżej oraz"
+    - x: "*[3]"
+    - t: "powyżej"
+-
+    # FIX: this could use more special cases 
+    name: default
+    tag: mmultiscripts
+    variables:
+    - Prescripts: "m:mprescripts/following-sibling::*"
+    - Postscripts: "m:mprescripts/preceding-sibling::*[position() < last()]"
+    match: "."
+    replace: 
+    - x: "*[1]"
+    - test:
+        if: "$Prescripts"
+        then_test:
+            if: "count($Prescripts) = 2"    # more common case
+            then:
+            - test:
+                if: "not($Prescripts[1][self::m:none])"
+                then:
+                - t: "z indeksem dolnym po lewej"
+                - x: "$Prescripts[1]"
+            - test:
+                if: "not($Prescripts[1][self::m:none] or $Prescripts[2][self::m:none])"
+                then: [t: "oraz"]
+            - test:
+                if: "not($Prescripts[2][self::m:none])"
+                then:
+                - t: "indeksem górnym po lewej"
+                - x: "$Prescripts[2]"
+            else:
+            - t: "z"
+            - x: "count($Prescripts) div 2"
+            - t: "indeksami po lewej"
+            - pause: short
+            - x: "$Prescripts"   # FIX: should alternatively say upper/lower 
+    - test:
+        if: "count($Postscripts)"
+        then_test:
+            if: "count($Postscripts) = 2"    # more common case
+            then:
+            - test:
+                if: "not($Postscripts[1][self::m:none])"
+                then:
+                - t: "z indeksem dolnym po prawej"
+                - x: "$Postscripts[1]"
+            - test:
+                if: "not($Postscripts[1][self::m:none] or $Postscripts[2][self::m:none])"
+                then: [t: "oraz"]
+            - test:
+                if: "not($Postscripts[2][self::m:none])"
+                then:
+                - t: "z indeksem górnym po prawej"
+                - x: "$Postscripts[2]"
+            else:
+            - t: "z"
+            - x: "count($Postscripts) div 2"
+            - t: "indeksami po prawej"
+            - pause: short
+            - x: "$Postscripts"   # FIX: should alternatively say upper/lower 
+
+-
+    name: default
+    tag: mtable
+    variables: [IsColumnSilent: false()]
+    match: "."
+    replace: 
+    - t: "tabela z"
+    - x: count(*)
+    - test: 
+         if: count(*)=1
+         then: {t: "wierszem"}
+         else: {t: "wierszami"}
+    - t: oraz
+    - x: "count(*[1]/*)"
+    - test: 
+         if: "count(*[1]/*)=1"
+         then: {t: "kolumną"}
+         else: {t: "kolumnami"}
+    - pause: long
+    - x: "*"
+
+-
+    # this may get called from navigation -- in that case, there is no context to speak the row #, so don't do it
+    # callers/context should do that.
+    name: default
+    tag: mtr
+    match: "."
+    replace:
+    - x: "*"
+
+-
+    name: default
+    tag: mtd
+    match: "."
+    replace:
+    - t: "kolumna"
+    - x: "count(preceding-sibling::*)+1"
+    - pause: medium
+    - x: "*"  # speak the entry
+    - pause: long
+
+-
+  # Note: @notation can contain more than one value
+  # The ordering below is the order in which words come out when there is more than one value
+  # 
+    name: default
+    tag: menclose
+    match: "."
+    replace:
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' box ')]"
+        then: [t: w prostokątnej ramce, pause: short]
+    - test:
+        if: ".[contains(@notation,'roundedbox')]"
+        then: [t: w zaokrąglonej ramce, pause: short]
+    - test:
+        if: ".[contains(@notation,'circle')]"
+        then: [t: w okrągłej ramce, pause: short]
+    - test:
+        if: ".[ contains(concat(' ', normalize-space(@notation), ' '), ' left ') or 
+                contains(concat(' ', normalize-space(@notation), ' '), ' right ') or 
+                contains(@notation,'top') or contains(@notation,'bottom') ]"
+        then:
+          - t: z linią ramki
+          - test:
+              if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' left ')]"
+              then: [t: po lewej, pause: short]
+          - test:
+              if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' right ')]"
+              then: [t: po prawej, pause: short]
+          - test:
+              if: ".[contains(@notation,'top')]"
+              then: [t: na górze, pause: short]
+          - test:
+              if: ".[contains(@notation,'bottom')]"
+              then: [t: na dole, pause: short]
+    - test:
+        if: ".[ contains(@notation,'updiagonalstrike') or contains(@notation,'downdiagonalstrike') or 
+                contains(@notation,'verticalstrike') or contains(@notation,'horizontalstrike') ]"
+        then:
+          - test:
+              if: ".[contains(@notation,'updiagonalstrike') and contains(@notation,'downdiagonalstrike')]"
+              then: [spell: krzyżowo, t: krzyżowo, pause: short]  # seems better to say 'x cross out' than 'up diagonal, down diagonal cross out'
+              else:
+                - test:
+                    if: ".[contains(@notation,'updiagonalstrike')]"
+                    then: [t: diagonalnie, pause: short]
+                - test:
+                    if: ".[contains(@notation,'downdiagonalstrike')]"
+                    then: [t: odwrotnie diagonalnie, pause: short]
+          - test:
+              if: ".[contains(@notation,'verticalstrike')]"
+              then: [t: pionowo, pause: short]
+          - test:
+              if: ".[contains(@notation,'horizontalstrike')]"
+              then: [t: poziomo, pause: short]
+          - t: przekreślone
+          - pause: short
+    - test:
+        if: ".[contains(@notation,'uparrow')]"
+        then: [t: ze strzałką w górę, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' downarrow ')]"
+        then: [t: ze strzałką w dół, pause: short]
+    - test:
+        if: ".[contains(@notation,'leftarrow')]"
+        then: [t: ze strzałką w lewo, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' rightarrow ')]"
+        then: [t: ze strzałką w prawo, pause: short]
+    - test:
+        if: ".[contains(@notation,'northeastarrow')]"
+        then: [t: ze strzałką na północny wschód, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southeastarrow ')]"
+        then: [t: ze strzałką na południowy wschód, pause: short]
+    - test:
+        if: ".[contains(concat(' ', normalize-space(@notation), ' '), ' southwestarrow ')]"
+        then: [t: ze strzałką na południowy zachód, pause: short]
+    - test:
+        if: ".[contains(@notation,'northwestarrow')]"
+        then: [t: ze strzałką na północny zachód, pause: short]
+    - test:
+        if: ".[contains(@notation,'updownarrow')]"
+        then: [t: "z dwukierunkową, pionową strzałką", pause: short]
+    - test:
+        if: ".[contains(@notation,'leftrightarrow')]"
+        then: [t: "z dwukierunkową, poziomą strzałką", pause: short]
+    - test:
+        if: ".[contains(@notation,'northeastsouthwestarrow')]"
+        then: [t: "z dwukierunkową, diagonalną strzałką", pause: short]
+    - test:
+        if: ".[contains(@notation,'northwestsoutheastarrow')]"
+        then: [t: "z dwukierunkową, odwrotnie diagonalną strzałką", pause: short]
+    - test:
+        if: ".[contains(@notation,'actuarial')]"
+        then: [t: z aktuarialnym symbolem, pause: short]
+    - test:
+        if: ".[contains(@notation,'madrub')]"
+        then: [t: z arabskim symbolem ułamka, pause: short]
+    - test:
+        if: ".[contains(@notation,'phasorangle')]"
+        then: [t: ze wskazem kąta, pause: short]
+    - test:
+        if: ".[contains(@notation,'longdiv') or not(@notation) or normalize-space(@notation) ='']"      # default
+        then: [t: z symbolem dzielenia pod kreskę, pause: short]
+    - test:
+        if: ".[contains(@notation,'radical')]"
+        then: [t: pod pierwiastkiem kwadratowym, pause: short]
+    - t: zawiera się wzór
+    - x: "*"
+    - test:
+        if: "$Impairment = 'Blindness' and ( $SpeechStyle != 'SimpleSpeak' or not(IsNode(*[1], 'leaf')) )"
+        then: [t: koniec wzoru]
+    - pause: short
+
+-
+    name: semantics
+    tag: "semantics"
+    match: "*[@encoding='MathML-Presentation']"
+    replace: 
+    - x: "*[@encoding='MathML-Presentation']/*[1]" 
+
+-
+    name: semantics-default
+    tag: "semantics"
+    match: .
+    replace: 
+    - x: "*[1]"
+
+-
+    # uncaught intent -- speak as foo of arg1 comma arg2 ....
+    name: default-children
+    tag: "*"
+    match: count(*)>0
+    replace: 
+    - x: "translate(name(.), '-', ' ')"
+    - t: "od"
+    - pause: short
+    - insert:
+        nodes: "*"
+        replace: [t: "przecinek", pause: auto]
+
+-
+    # unknown leaf -- just speak the text -- could be a literal intent
+    name: default-text
+    tag: "*"
+    match: "."
+    replace: 
+    - x: "translate(name(), '-', ' ')"

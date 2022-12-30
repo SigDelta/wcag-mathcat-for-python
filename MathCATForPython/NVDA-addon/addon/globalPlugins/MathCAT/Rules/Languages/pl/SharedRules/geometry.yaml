@@ -1,0 +1,63 @@
+---
+
+-
+   name: line-segment
+   tag: line-segment
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "odcinek od" 
+      - x: "*[1]"
+      - t: "do"
+      - x: "*[2]"
+      else:
+      - t: "odcinek" 
+      - x: "*[1]"
+      - x: "*[2]"
+
+-
+   name: geometry-ray
+   tag: ray
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "półprosta od" 
+      - x: "*[1]"
+      - t: "do"
+      - x: "*[2]"
+      else:
+      - t: "półprosta" 
+      - x: "*[1]"
+      - x: "*[2]"
+
+-
+   name: geometry-arc
+   tag: arc
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then: [t: ""]
+   - t: "kąt" 
+   - x: "*[1]"
+   - x: "*[2]"
+
+-
+   name: measure-of-angle
+   tag: measure-of-angle
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "miara kąta" 
+      else:
+      - t: "miara kąta" 
+   - x: "*[1]"
+   - x: "*[2]"
+   - x: "*[3]"
+

@@ -1,0 +1,614 @@
+---
+
+ - "a": 
+    - test: 
+        if: "$TTS='none'"
+        then: [t: "a"]                         # long "a" sound in all speech engines I tested (espeak, MS SAPI, eloquence,
+        else: [spell: "a"]                         #    AWS Polly, ReadSpeaker, NaturalReader, google cloud, nuance, ibm watson)
+ - "b-z": 
+    - test: 
+        if: "$TTS='none'"
+        then: [t: "."]                          
+        else: [spell: "."]                       
+
+ - "A":
+    - test: 
+        if: "$TTS='none'"
+        then: [x: "$SpeechOverrides_CapitalLetters", t: "A"]                         # long "a" sound in all speech engines I tested (see above)
+        else: [spell: "A"]
+
+ - "B-Z": 
+    - test: 
+        if: "$TTS='none'"
+        # note: processing of ranges converts '.' into the character, so it needs to be in quotes below
+        then: [x: "$SpeechOverrides_CapitalLetters", x: "translate('.', 'BCDEFGHIJKLMNOPQRSTUVWXYZ', 'bcdefghijklmnopqrstuvwxyz')"]                         
+        else: {spell: "."}                       
+
+ - "0-9": [t: "."]
+
+ - "!": [t: silnia]                           # 0x21
+ - "\"": [t: bis]                     # 0x22
+ - "#": [t: numer]                              # 0x23
+ - "$": [t: dolar]                             # 0x24
+ - "%": [t: procent]                             # 0x25
+ - "&": [t: ampersand]                           # 0x26
+ - "'": [t: prim]                          # 0x27
+ - "(":                                          # 0x28
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [test: {if: "$Verbosity='Terse'", then: [t: otwórz], else: [t: otwórz nawias]}]
+        else: [t: lewy nawias]                            
+ - ")":                                          # 0x29
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [test: {if: "$Verbosity='Terse'", then: [t: zamknij], else: [t: zamknij nawias]}]
+        else: [t: prawy nawias]                            
+
+ - "*": [t: razy]                               # 0x2a
+ - "+": [t: plus]                                # 0x2b
+ - ",":                                          # 0x2c
+    # the following deals with the interaction of "," with "…" which sometimes wants the ',' to be silent
+    # that this test is here and not with "…" is not ideal, but seems simplest
+     test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or "
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak "comma" when not adjacent to '…'
+            - "( following-sibling::*[1][text()!= '…'] and preceding-sibling::*[1][text()!='…']  ) or "
+               # except if expression starts with '…'
+            - " ../*[1][text()='…'] "
+        then: [t: przecinek]
+        # else silent
+
+ - "-": [t: minus]                               # 0x2d
+ - ".":                                          # 0x2e
+    - test:
+        if: "parent::*[1][self::m:mn]"
+        then: [t: "kropka"]
+        else: [t: "kropka"]
+ - "/": [t: dzielone przez]                          # 0x2f
+ - ":": [t: dwukropek]                               # 0x3a
+ - ";": [t: średnik]                           # 0x3b
+ - "<":                                          # 0x3c
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: jest]
+     - t: mniejsze niż
+ - "=": [t: równe]                              # 0x3d
+ - ">":                                          # 0x3e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: jest]
+     - t: większe niż
+ - "?": [t: znak zapytania]                       # 0x3f
+ - "@": [t: małpa]                             # 0x40
+ - "[":                                          # 0x5b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [t: otwórz nawias kwadratowy]
+        else: [t: lewy nawias kwadratowy]                            
+ - "\\": [t: ukośnik wsteczny]                         # 0x5c
+ - "]":                                          # 0x5d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [t: zamknij nawias kwadratowy]
+        else: [t: prawy nawias kwadratowy]
+ - "^": [t: daszek]                                # 0x5e
+ - "_": [t: dolna kreska]                          # 0x5f
+ - "`": [t: grawis]                              # 0x60
+ - "{":                                         # 0x7b
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [t: otwórz nawias klamrowy]
+        else: [t: lewy nawias klamrowy]                            
+ - "|":                                          # 0x7c
+    # note: for ClearSpeak and SimpleSpeak, "|" in side of sets is handled at the mrow level, same for 'sets'
+     - test:
+        - if: $SpeechStyle != 'ClearSpeak'
+          then: [t: pionowa kreska]
+        - else_if: "$ClearSpeak_VerticalLine = 'SuchThat'"
+          then: [t: takie jak]
+        - else_if: "$ClearSpeak_VerticalLine = 'Given'"  
+          then: [t: dany] 
+        - else: [t: dzieli]                   
+
+ - "}":                                          # 0x7d
+    - test:
+        if: $SpeechStyle = 'ClearSpeak' or $SpeechStyle = 'SimpleSpeak'
+        then: [t: zamknij nawias klamrowy]
+        else: [t: prawy nawias klamrowy]                            
+
+ - "~": [t: tylda]                               # 0x7e
+ - " ": [t: ""]                                  # 0xa0
+ - "¢": [t: cent]                               # 0xa2
+ - "£": [t: funt]                              # 0xa3
+ - "¬": [t: negacja]                                 # 0xac
+ - "°": [t: "stopni"]                           # 0xb0
+ - "±": [t: plus lub minus]                       # 0xb1
+ - "´": [t: "akcent ostry"]                            # 0xb4
+ - "·":
+    - test:
+        if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolDot = 'Auto'"
+        then: [t: razy]
+        else: [t: kropka]
+ - "×":                                          # 0xd7
+    - test:
+        if: "preceding-sibling::*[1][text()= '∇']"
+        then: [t: ""]
+        else_test:
+            if: "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_MultSymbolX = 'Auto'"
+            then: [t: razy]
+            else_test:
+                if: $ClearSpeak_MultSymbolX = 'By'
+                then: [t: przez]
+                else: [t: krzyżyk]
+ - "÷": [t: dzielone przez]                          # 0xf7
+ - "̀": [t: akcent z grawisem]          # 0x300
+ - "́": [t: akcent ostry]          # 0x301
+ - "̂": [t: akcent przeciągły]     # 0x302
+ - "̃": [t: akcent z tyldą]                 # 0x303
+ - "̄": [t: akcent makron]                # 0x304
+ - "̅": [t: akcent z długą kreską]               # 0x305
+ - "̆": [t: brewis]                 # 0x306
+ - "̇": [t: akcent z kropką]             # 0x307
+ - "Α":                                          # 0x391
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: alfa
+ - "Β":                                          # 0x392
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: beta
+ - "Γ":                                          # 0x393
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: gamma
+
+    # Note: ClearSpeak has pref TriangleSymbol for this character, but that is wrong
+ - "Δ":                                          # 0x394
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: delta
+ - "Ε":                                          # 0x395
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: epsilon
+ - "Ζ":                                          # 0x396
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: zeta
+ - "Η":                                          # 0x397
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: eta
+ - "Θ":                                          # 0x398
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: teta
+ - "Ι":                                          # 0x399
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: iota
+ - "Κ":                                          # 0x39a
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: kappa
+ - "Λ":                                          # 0x39b
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: lamda
+ - "Μ":                                          # 0x39c
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: mi
+ - "Ν":                                          # 0x39d
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: nu
+ - "Ξ":                                          # 0x39e
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: zai
+ - "Ο":                                          # 0x39f
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: omikron
+ - "Π":                                          # 0x3a0
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: pi
+ - "Ρ":                                          # 0x3a1
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: ro
+ - "Σ":                                          # 0x3a3
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: sigma
+ - "Τ":                                          # 0x3a4
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: tau
+ - "Υ":                                          # 0x3a5
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: upsilon
+ - "Φ":                                          # 0x3a6
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: pi
+ - "Χ":                                          # 0x3a7
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: chi
+ - "Ψ":                                          # 0x3a8
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: psi
+ - "Ω":                                          # 0x3a9
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: omega
+ - "Ϊ":                                          # 0x3aa
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: iota umlaut
+ - "Ϋ":                                          # 0x3ab
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: upsilon umlaut
+ - "α": [t: alfa]                               # 0x3b1
+ - "β": [t: beta]                                # 0x3b2
+ - "γ": [t: gamma]                               # 0x3b3
+ - "δ": [t: delta]                               # 0x3b4
+ - "ε": [t: epsilon]                             # 0x3b5
+ - "ζ": [t: zeta]                                # 0x3b6
+ - "η": [t: eta]                                 # 0x3b7
+ - "θ": [t: teta]                               # 0x3b8
+ - "ι": [t: iota]                                # 0x3b9
+ - "κ": [t: kappa]                               # 0x3ba
+ - "λ": [t: lamda]                               # 0x3bb
+ - "μ": [t: mi]                                  # 0x3bc
+ - "ν": [t: nu]                                  # 0x3bd
+ - "ξ": [t: zai]                                 # 0x3be
+ - "ο": [t: omikron]                             # 0x3bf
+ - "π": [t: pi]                                  # 0x3c0
+ - "ρ": [t: ro]                                 # 0x3c1
+ - "ς": [t: final sigma]                         # 0x3c2
+ - "σ": [t: sigma]                               # 0x3c3
+ - "τ": [t: tau]                                 # 0x3c4
+ - "υ": [t: upsilon]                             # 0x3c5
+ - "φ": [t: phi]                                 # 0x3c6
+ - "χ": [t: chi]                                 # 0x3c7
+ - "ψ": [t: psi]                                 # 0x3c8
+ - "ω": [t: omega]                               # 0x3c9
+ - "ϕ": [t: phi]                                 # 0x3d5
+ - "ϖ": [t: pi]                                  # 0x3d6
+ - "ϵ": [t: epsilon]                             # 0x3f5
+ - "϶": [t: odwrotny epsilon]                    # 0x3f6
+ - "А":                                          # 0x410
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: a
+ - "–": [t: daszek]                             # 0x2013
+ - "—": [t: daszek]                             # 0x2014
+ - "―": [t: pozioma linia]                      # 0x2015
+ - "‖": [t: podwójna pionowa linia]                # 0x2016
+ - "•": [t: punktor]                              # 0x2022
+ - "…":                                          # 0x2026
+    test:
+        if:
+            - "$SpeechStyle != 'ClearSpeak' or $ClearSpeak_Ellipses = 'Auto' or"
+               # must be ClearSpeak and $ClearSpeak_Ellipses = 'AndSoOn'
+               # speak '…' as 'and so on...' unless expr starts with '…'
+            - "../*[1][text()='…']"
+        then: [t: wielokropek]
+        else_test:  # must have $ClearSpeak_Ellipses = 'AndSoOn'
+            if: "count(following-sibling::*) = 0"
+            then: [t: i tak dalej]
+            else: [t: i tak dalej aż do]
+
+ - "⁡":                                          # 0x2061
+    - test:
+        if: "$Verbosity!='Terse' and not(preceding-sibling::*[1][IsInDefinition(., 'GeometryShapes')])" 
+        then: [t: "od"]
+ - "⁢": [t: ""]                                   # 0x2062
+ - "⁣": [t: ""]                                   # 0x2063
+ - "⁤": [t: "i"]                                # 0x2064
+ - "′": [t: prim]                               # 0x2032
+ - "″": [t: podwójny prim]                        # 0x2033
+ - "‴": [t: potrójny prim]                        # 0x2034
+ - "‵": [t: odwrotny prim]                      # 0x2035
+ - "‶": [t: odwrotny podwójny prim]               # 0x2036
+ - "‷": [t: odwrotny potrójny prim]               # 0x2037
+ - "ℂ":                                          # 0x2102
+     - t: pogrubienie tablicy
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: C
+ - "℃": [t: stopni celsjusza]                     # 0x2103
+ - "℉": [t: stopni fahrenheita]                  # 0x2109
+ - "ℋ":                                          # 0x210b
+     - t: kaligraficzne
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: h
+ - "ℎ": [t: stała Planka]                     # 0x210e
+ - "ℓ": [t: kaligraficzne l]                            # 0x2113
+ - "ℕ":                                          # 0x2115
+     - t: pogrubienie tablicy
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: n
+ - "ℚ":                                          # 0x211a
+     - t: pogrubienie tablicy
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: q
+ - "ℛ":                                          # 0x211b
+     - t: kaligraficzne
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: r
+ - "ℜ":                                          # 0x211c
+     - t: ręczne
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: r
+ - "ℝ":                                          # 0x211d
+     - t: pogrubienie tablicy
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: r
+ - "ℤ":                                          # 0x2124
+     - t: pogrubienie tablicy
+     - test: 
+         if: "($Blind or $Verbosity!='Terse')"
+         then: [t: "wielkie"]
+     - t: z
+ - "Ω": [t: om]                                # 0x2126
+ - "K": [t: kelvin]                              # 0x212a
+ - "Å": [t: angstromy]                           # 0x212b
+ - "ⅆ": [t: pogrubienie tablicy kursywa D]              # 0x2146
+ - "ⅇ": [t: pogrubienie tablicy kursywa E]              # 0x2147
+ - "ⅈ": [t: pogrubienie tablicy kursywa I]              # 0x2148
+ - "ⅉ": [t: pogrubienie tablicy kursywa J]              # 0x2149
+ - "←": [t: strzałka w lewo]                     # 0x2190
+ - "↑": [t: strzałka w górę]                       # 0x2191
+ - "→":                                          # 0x2192
+     - test:
+        if: "ancestor::*[2][self::m:limit]"
+        then: [t: "dąży do"]
+        else: [t: "strzałka w prawo"]
+
+ - "↓": [t: strzałka w dół]                     # 0x2193
+ - "⇒": [t: podwójna strzałka w prawo]             # 0x21d2
+ - "∀": [t: dla każdego]                             # 0x2200
+ - "∂":                                          # 0x2202
+     - test: 
+         if: "$Verbosity='Terse'"
+         then: {t: pochodna cząstkowa}
+         else: {t: pochodna cząstkowa}
+ - "∃": [t: istnieje]                        # 0x2203
+ - "∄": [t: nie istnieje]                # 0x2204
+ - "∅": [t: zbiór pusty]                           # 0x2205
+ - "∆":                                          # 0x2206
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: ""]
+     - t: laplasjan z
+ - "∇":
+      - test: 
+         if: "following-sibling::*[1][text()= '⋅']"
+         then: {t: dywergencja z} #TODO: in theory ∇⋅v != div(v) for tensors of higher dimensions, but for now is much better than saying "gradient z razy v"
+         else_test:
+            if: "following-sibling::*[1][text()= '×']"
+            then: {t: rotacja z}
+            else: {t: gradient z}                                   # 0x2207
+ - "∈":                                          # 0x2208
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [t: należy do]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: w]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: należy do]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: należy do]
+              - else: [t: należy do]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: jest elementem zbioru]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: jest elementem zbioru]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: jest w]
+              - else: [t: należy do]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "∉":                                          # 0x2209
+    # rule is identical to 0x2208
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [t: nie należy do]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: nie w]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: nie należy do]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: nie należy do]
+              - else: [t: nie należy do]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: nie jest elementem zbioru]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: nie jest elementem zbioru]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: nie jest w]
+              - else: [t: nie należy do]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "∊":                                          # 0x220a
+     - test:
+        if: "$SpeechStyle != 'ClearSpeak'"
+        then: [t: należy do]
+        # Several options for speaking elements in ClearSpeak -- they split between being inside a set or not and then the option
+        else_test:
+            if: "../../self::m:set or ../../../self::m:set" # inside a set
+            then_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: w]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: należy do]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: należy do]
+              - else: [t: należy do]             # $ClearSpeak_SetMemberSymbol = 'Belongs'
+            else_test:
+              - if: $ClearSpeak_SetMemberSymbol = 'Auto' or $ClearSpeak_SetMemberSymbol = 'Member'
+                then: [t: jest elementem zbioru]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'Element'
+                then: [t: jest elementem zbioru]
+              - else_if: $ClearSpeak_SetMemberSymbol = 'In'
+                then: [t: jest w]
+              - else: [t: należy do]              # $ClearSpeak_SetMemberSymbol = 'Belongs'
+ - "∏": [t: produkt]                             # 0x220f
+ - "∐": [t: koprodukt]                           # 0x2210
+ - "∑": [t: suma]                                 # 0x2211
+ - "−": [t: minus]                               # 0x2212
+ - "∓": [t: minus lub plus]                       # 0x2213
+ - "∗": [t: razy]                               # 0x2217
+ - "∘": [t: złożony z]                       # 0x2218
+ - "∙": [t: razy]                               # 0x2219
+ - "√":                                          # 0x221a
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: ""]
+     - t: pierwiastek kwadratowy z
+ - "∝":                                          # 0x221d
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: jest]
+     - t: proporcjonalne do
+ - "∞": [t: "nieskończoność"]                          # 0x221e
+ - "∟": [t: kąt prosty]                         # 0x221f
+ - "∠": [t: kąt]                               # 0x2220
+ - "∡": [t: kąt]                      # 0x2221
+ - "∣": [t: dzieli]                              # 0x2223
+ - "∤": [t: nie dzieli]                      # 0x2224
+ - "∥":                                           # 0x2225
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: jest]
+     - t: równoległe do
+ - "∦":                                           # 0x2226
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: jest]
+     - t: nierównoległe do
+ - "∧": [t: i]                                 # 0x2227
+ - "∨": [t: lub]                                  # 0x2228
+ - "∩": [t: część wspólna]                        # 0x2229
+ - "∪": [t: unia]                               # 0x222a
+ - "∫": [t: całka]                            # 0x222b
+ - "∬": [t: podwójna całka]                     # 0x222c
+ - "∭": [t: potrójna całka]                     # 0x222d
+ - "∮": [t: całka krzywoliniowa]                    # 0x222e
+ - "∶":                                          # 0x2236
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: ""]
+     - t: do
+ - "∷": [t: jak]                                  # 0x2237
+ - "∼": [t: zmienia się w zależności od]                         # 0x223c
+ - "∽": [t: odwrócona tylda]                      # 0x223d
+ - "∾":                                          # 0x223e
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: ""]
+     - t: odwócone poziome S
+ - "∿": [t: sinusoida]                           # 0x223f
+ - "≠":                                          # 0x2260
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: ""]
+     - t: różne od
+ - "≡":                                          # 0x2261
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {t: tożsame z}
+ - "≤":                                          # 0x2264
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {t: mniejsze równe}
+ - "≥":                                          # 0x2265
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {t: większe równe}
+ - "≦": [t: mniejsze nad równe]             # 0x2266
+ - "≧": [t: większe nad równe]          # 0x2267
+ - "≺": [t: poprzedza]                            # 0x227a
+ - "≻": [t: następuje po]                            # 0x227b
+ - "⊂":                                          # 0x2282
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {t: zawiera się w}
+ - "⊃":                                          # 0x2283
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {t: zawiera}
+ - "⊄":                                          # 0x2284
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: ""]
+     - t: nie zawiera się w 
+ - "⊅":                                          # 0x2285
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: [t: ""]
+     - t: nie zawiera
+ - "⊆":                                          # 0x2286
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {t: zawiera się w lub jest równy}
+ - "⊇":                                          # 0x2287
+     - test: 
+         if: "$Verbosity!='Terse'"
+         then: {t: zawiera lub jest równy}

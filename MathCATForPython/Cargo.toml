@@ -1,0 +1,33 @@
+[package]
+name = "MathCatForPython"
+version = "0.1.4"
+authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+# [dependencies]
+
+[lib]
+name = "libmathcat"
+crate-type = ["cdylib"]
+
+[dependencies.mathcat]
+version = "0.1.22"
+# for testing MathCAT without having to publish a new version (change two occurences)
+# path = "../MathCAT/"
+
+[dependencies.pyo3]
+version = "0.15.1"
+features = ["extension-module", "abi3-py36"]
+
+[build-dependencies]
+zip = { version = "0.6.2", default-features = false, features = ["deflate"] }
+mathcat = "0.1.22"
+# for testing MathCAT without having to publish a new version (change two occurences)
+#mathcat = {version= "0.1.22", path = "../MathCAT/"}
+
+
+[profile.release]
+lto = true
+# opt-level = "z"  # Optimize for size.

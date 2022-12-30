@@ -1,0 +1,122 @@
+---
+
+-
+   name: simple-determinant
+   tag: determinant
+   match: "not(*[1][self::m:mtr])"
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "" 
+   - t: "wyznacznik"
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "z" 
+   - x: "*[1]"
+
+-
+   name: norm
+   tag: norm
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "" 
+   - t: "norma"
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "z" 
+   - x: "*[1]"
+
+-
+   name: subscripted-norm
+   tag: subscripted-norm
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "" 
+   - x: "*[2]"
+   - t: "norma"
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "z" 
+   - x: "*[1]"
+
+-
+   name: transpose
+   tag: transpose
+   match: "."
+   replace:
+   - x: "*[1]"
+   - t: "transponowane"
+-
+   name: trace
+   tag: trace
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "" 
+   - t: "ślad"
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "z" 
+   - x: "*[1]"
+
+-
+   name: dimension
+   tag: dimension
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "" 
+   - t: "wymiar"
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "z" 
+   - x: "*[1]"
+
+-
+   name: homomorphism
+   tag: homomorphism
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "" 
+   - t: "homomorfizm"
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "z" 
+   - x: "*[1]"
+
+-
+   name: kernel
+   tag: kernel
+   match: "."
+   replace:
+   - test:
+      if: "$Verbosity='Verbose'"
+      then:
+      - t: "" 
+   - t: "jądro"
+   - test:
+      if: "$Verbosity!='Terse'"
+      then:
+      - t: "z" 
+   - x: "*[1]"
+

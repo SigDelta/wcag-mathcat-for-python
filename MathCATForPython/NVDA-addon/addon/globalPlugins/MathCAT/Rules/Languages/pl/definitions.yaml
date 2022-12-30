@@ -1,0 +1,109 @@
+---
+[
+# Lines starting with "#" are a comment
+# Each definition in this file is of the form
+#   name: [ "...", "..." "..." ],
+
+
+# ----------------  Cardinal and Ordinal Numbers  --------------------------
+# The following definitions are used to convert numbers to words
+# The are mainly used for ordinals, of which there are two cases:
+# 1. Regular ordinals: first, second, third, ...
+# 2. Ordinals used in the denominator of fractions (e.g, one half, one third)
+#    When used in the denominator of fractions, a plural version might be
+#    used (e.g., two halves, two thirds)
+# Although a lot of languages are regular after a few entries, for generality,
+# the following lists should be filled out even though they are the same
+# or easily derived from others in many languages (e.g, an 's' is added for plurals).
+# The larger ordinal numbers (e.g, millionth) is used when there are only
+# '0's after that decimal place (e.g., 23000000).:w
+
+# All definitions start 0, 10, 100, etc.
+
+# The definitions for the "ones" should extend until a regular pattern begins
+#   The minimum length is 10.
+
+# For English, a regular pattern starts at twenty
+    NumbersOnes: [
+        "zero", "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć",
+        "dziesięć", "jedenaście", "dwanaście", "trzynaście", "czternaście", "piętnaście", "szesnaście",
+        "siedemnaście", "osiemnaście", "dziewiętnaście"
+    ],
+
+    NumbersOrdinalOnes: [
+        "zerowa", "pierwsza", "druga", "trzecia", "czwarta", "piąta", "szósta", "siódma", "ósma", "dziewiąta",
+        "dziesiąta", "jedenasta", "dwunasta", "trzynasta", "czternasta", "piętnasta", "szesnasta",
+        "siedemnasta", "osiemnasta", "dziewiętnasta"
+    ],
+
+    NumbersOrdinalPluralOnes: [
+        "zerowe", "pierwsze", "drugie", "trzecie", "czwarte", "piąte", "szóste", "siódme", "ósme", "dziewiąte",
+        "dziesiąte", "jedenaste", "dwunaste", "trzynaste", "czternaste", "piętnaste", "szesnaste",
+        "siedemnaste", "osiemnaste", "dziewiętnaste"
+    ],
+
+    # stop when regularity begins
+    NumbersOrdinalFractionalOnes: [
+        "zerowa", "pierwsza", "druga", "trzecia", "czwarta", "piąta", "szósta", "siódma", "ósma", "dziewiąta",
+        "dziesiąta", "jedenasta", "dwunasta", "trzynasta", "czternasta", "piętnasta", "szesnasta",
+        "siedemnasta", "osiemnasta", "dziewiętnasta"
+    ],
+
+    # for 2,3 and 4 in nominator
+    # NumbersOrdinalFractional234Ones: [
+    #     "zerowe", "pierwsze", "drugie", "trzecie", "czwarte", "piąte", "szóste", "siódme", "ósme", "dziewiąte",
+    #     "dziesiąte", "jedenaste", "dwunaste", "trzynaste", "czternaste", "piętnaste", "szesnaste",
+    #     "siedemnaste", "osiemnaste", "dziewiętnaste"
+    # ],
+    # stop when regularity begins
+    NumbersOrdinalFractionalPluralOnes: [
+        "zerowych", "pierwszych", "drugich", "trzecich", "czwartych", "piątych", "szóstych", "siódmych", "ósmych", "dziewiątych",
+        "dziesiątych", "jedenastych", "dwunastych", "trzynastych", "czternastych", "piętnastych", "szesnastych",
+        "siedemnastych", "osiemnastych", "dziewiętnastych"
+    ],
+
+
+    # What to use for multiples of 10
+    NumbersTens: [
+        "", "dziesięć", "dwadzieścia", "trzydzieści", "czterdzieści", "pięćdziesiąt", "sześćdziesiąt", "siedemdziesiąt", "osiemdziesiąt", "dziewięćdziesiąt"
+    ],
+
+    NumbersOrdinalTens: [
+        "", "dziesiąta", "dwudziesta", "trzydziesta", "czterdziesta", "pięćdziesiąta", "sześćdziesiąta", "siedemdziesiąta", "osiemdziesiąta", "dziewięćdziesiąta"
+    ],
+
+    NumbersOrdinalPluralTens: [
+        "", "dziesiąte", "dwudzieste", "trzydzieste", "czterdzieste", "pięćdziesiąte", "sześćdziesiąte", "siedemdziesiąte", "osiemdziesiąte", "dziewięćdziesiąte"
+    ],
+
+
+    NumbersHundreds: ["", "sto", "dwieście", "trzysta", "czterysta ", "pięćset",
+        "sześćset", "siedemset", "osiemset", "dziewięćset"
+    ],
+
+    NumbersOrdinalHundreds: ["", "setna", "dwusetna", "trzysetna", "czterysetna", "pięćsetna",
+        "sześćsetna", "siedemsetna", "osiemsetna", "dziewięćsetna"
+    ],
+
+    NumbersOrdinalPluralHundreds: ["", "setne", "dwusetne", "trzysetne", "czterysetne", "pięćsetne",
+        "sześćsetne", "siedemsetne", "osiemsetne", "dziewięćsetne"
+    ],
+      
+
+    # At this point, hopefully the language is regular. If not, code needs to be written
+    NumbersLarge: [
+        "", "tysiąc", "milion", "bilion", "trylion", "kwadrylion",
+        "kwintylion", "sekstylion", "septylion", "oktylion", "nonilion",
+    ],
+      
+    NumbersOrdinalLarge: [
+        "", "tysięczna", "milionowa", "bilionowa", "trylionowa", "kwadrylionowa",
+        "kwintylionowa", "sekstylionowa", "septylionowa", "oktylionowa", "nonilionowa"
+    ],
+      
+    NumbersOrdinalPluralLarge: [
+        "", "tysięczne", "milionowe", "bilionowe", "trylionowe", "kwadrylionowe",
+        "kwintylionowe", "sekstylionowe", "septylionowe", "oktylionowe", "nonilionowe"
+    ]
+
+]
