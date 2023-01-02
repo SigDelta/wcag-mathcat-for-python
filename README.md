@@ -10,6 +10,8 @@ In order to build Python package from Rust code follow below step:
 
 Path to generated ```.whl``` file should be found in the logs of previous maturin command.
 
+**Warning!** In order to perform step 4, you need to have Rust compiler installed.
+
 5. Now you can install package from ```.whl``` file in any project you need. 
 
 Note that interface that is available from Python package is defined in ```<MathCAT_directory_path>/src/lib.rs```
