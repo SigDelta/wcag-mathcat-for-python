@@ -3,15 +3,6 @@
 version = 3
 
 [[package]]
-name = "MathCatForPython"
-version = "0.1.0"
-dependencies = [
- "mathcat",
- "pyo3",
- "zip",
-]
-
-[[package]]
 name = "addr2line"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -963,6 +954,15 @@ name = "wasm-bindgen-shared"
 version = "0.2.82"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6598dd0bd3c7d51095ff6531a5b23e02acdc81804e30d8f07afb77b7215a140a"
+
+[[package]]
+name = "wcag-mathcat"
+version = "0.1.0"
+dependencies = [
+ "mathcat",
+ "pyo3",
+ "zip",
+]
 
 [[package]]
 name = "winapi"
