@@ -1,6 +1,6 @@
 [package]
 name = "MathCatForPython"
-version = "0.1.4"
+version = "0.1.0"
 authors = ["Neil Soiffer <soiffer@alum.mit.edu>"]
 edition = "2018"
 
